@@ -1,7 +1,13 @@
 import CodeforcesAPI from "./src/codeforcesAPI.js";
 import ExcelJS from "exceljs";
 import fs from "fs";
-let { handle, minProblemRating, maxProblemRating, numberOfContests } = (() => {
+let {
+  handles,
+  minProblemRating,
+  maxProblemRating,
+  numberOfContests,
+  problemRatingDistribution,
+} = (() => {
   const data = fs.readFileSync("config.json", "utf8");
   return JSON.parse(data);
 })();
@@ -136,7 +142,7 @@ function saveProblemsToHtml(problems, succesfulSubmissions, otherSubmissions) {
   </head>
   <body>
   <div class="user-info">
-    <h2>User Handle: ${handle}</h2>
+    <h2>User Handle: ${handles}</h2>
     <p>Min Problem Rating: ${minProblemRating}</p>
     <p>Max Problem Rating: ${maxProblemRating}</p>
     <p>Number of Past contests: ${numberOfContests}</p>
@@ -186,14 +192,49 @@ async function main() {
     maxProblemRating
   );
   console.log(`Found ${problems.length} problems`);
-  const allUserSubmissions = await CodeforcesAPI.getUserSubmissions(handle);
+  const allUserSubmissions = [
+    ...(await CodeforcesAPI.getUsersSubmissions(handles)),
+  ];
   const succesfulSubmissions = allUserSubmissions.filter(
     (submission) => submission.verdict == "OK"
   );
-  const otherSubmissions = allUserSubmissions.filter(
-    (submission) => submission.verdict != "OK"
+  const otherSubmissions = [];
+  console.log(`${JSON.stringify(problems[0])}`);
+  let problemRatingMap = new Map();
+  problems.forEach((problem) => {
+    let rating = problem.rating;
+    if (
+      succesfulSubmissions.some(
+        (submission) =>
+          submission.problem.contestId == problem.contestId &&
+          submission.problem.name == problem.name
+      )
+    ) {
+      return;
+    }
+    if (problemRatingMap.has(rating)) {
+      let problemSet = problemRatingMap.get(rating);
+      problemSet.add(problem);
+      problemRatingMap.set(rating, problemSet);
+    } else {
+      problemRatingMap.set(rating, new Set([problem]));
+    }
+  });
+  // console.log(problemRatingMap.get(1500));
+  const filterdProblems = [];
+  for (let [rating, problems] of problemRatingMap) {
+    let numberOfProblems = problemRatingDistribution[rating];
+    if (!numberOfProblems) continue;
+    let problemArray = Array.from(problems);
+    problemArray.sort((a, b) => b.contestId - a.contestId);
+    filterdProblems.push(...problemArray.slice(0, numberOfProblems));
+  }
+  console.log(`Found ${filterdProblems.length} problems`);
+  await saveProblemsToExcel(
+    filterdProblems,
+    succesfulSubmissions,
+    otherSubmissions
   );
-  await saveProblemsToExcel(problems, succesfulSubmissions, otherSubmissions);
-  saveProblemsToHtml(problems, succesfulSubmissions, otherSubmissions);
+  saveProblemsToHtml(filterdProblems, succesfulSubmissions, otherSubmissions);
 }
 main();

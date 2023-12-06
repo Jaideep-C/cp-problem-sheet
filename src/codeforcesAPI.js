@@ -19,6 +19,14 @@ export default class CodeforcesAPI {
       .sort((a, b) => b.id - a.id)
       .slice(0, Math.min(numberOfContests, contests.length));
   }
+  static async getUsersSubmissions(handles) {
+    const submissions = new Set();
+    for (const handle of handles) {
+      const userSubmissions = await this.getUserSubmissions(handle);
+      userSubmissions.forEach((submission) => submissions.add(submission));
+    }
+    return submissions;
+  }
   static async getUserSubmissions(handle) {
     try {
       const response = await axios.get(

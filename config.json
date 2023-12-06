@@ -1,6 +1,17 @@
 {
-  "handle": "loganwick",
-  "minProblemRating": 1400,
-  "maxProblemRating": 1400,
-  "numberOfContests": 100
+  "handles": ["Prajwal_p_m"],
+  "minProblemRating": 800,
+  "maxProblemRating": 4000,
+  "numberOfContests": 10000,
+  "problemRatingDistribution": {
+    "800": 8,
+    "900": 8,
+    "1000": 0,
+    "1100": 0,
+    "1200": 0,
+    "1300": 0,
+    "1400": 0,
+    "1500": 0,
+    "1600": 0
+  }
 }
