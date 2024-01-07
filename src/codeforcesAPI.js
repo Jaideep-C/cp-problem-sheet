@@ -5,6 +5,7 @@ export default class CodeforcesAPI {
   static API_URL = "https://codeforces.com/api";
   static FINISHED_PHASE = "FINISHED";
   static async getAllContests() {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     try {
       const response = await axios.get(`${this.API_URL}/contest.list`);
       return response.data.result;
@@ -12,10 +13,15 @@ export default class CodeforcesAPI {
       console.error(error);
     }
   }
-  static async getAllPastContests(numberOfContests) {
+  static async getAllPastContests(numberOfContests, validContests) {
+    // wait for 1 second before making the request
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     const contests = await this.getAllContests();
     return contests
       .filter((contest) => contest.phase == this.FINISHED_PHASE)
+      .filter((contest) =>
+        validContests.some((validName) => contest.name.includes(validName))
+      )
       .sort((a, b) => b.id - a.id)
       .slice(0, Math.min(numberOfContests, contests.length));
   }
@@ -28,10 +34,12 @@ export default class CodeforcesAPI {
     return submissions;
   }
   static async getUserSubmissions(handle) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     try {
       const response = await axios.get(
         `${this.API_URL}/user.status?handle=${handle}`
       );
+      if (response.status != 200) return [];
       return response.data.result;
     } catch (error) {
       console.error(error);
@@ -39,6 +47,7 @@ export default class CodeforcesAPI {
   }
 
   static async getAllProblems() {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     try {
       const response = await axios.get(`${this.API_URL}/problemset.problems`);
       return response.data.result.problems;
@@ -62,9 +71,13 @@ export default class CodeforcesAPI {
   static async getProblemsFromPastContestsByRating(
     numberOfContests,
     minRating,
-    maxRating
+    maxRating,
+    validContests
   ) {
-    const contests = await this.getAllPastContests(numberOfContests);
+    const contests = await this.getAllPastContests(
+      numberOfContests,
+      validContests
+    );
     const problems = await this.getProblemsForContests(contests);
     if (minRating > maxRating)
       throw new Error("minRating must be less than maxRating");

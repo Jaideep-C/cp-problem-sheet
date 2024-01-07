@@ -7,6 +7,7 @@ let {
   maxProblemRating,
   numberOfContests,
   problemRatingDistribution,
+  validContests,
 } = (() => {
   const data = fs.readFileSync("config.json", "utf8");
   return JSON.parse(data);
@@ -189,7 +190,8 @@ async function main() {
   const problems = await CodeforcesAPI.getProblemsFromPastContestsByRating(
     numberOfContests,
     minProblemRating,
-    maxProblemRating
+    maxProblemRating,
+    validContests
   );
   console.log(`Found ${problems.length} problems`);
   const allUserSubmissions = [
