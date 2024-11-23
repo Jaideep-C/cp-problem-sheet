@@ -1,0 +1,32 @@
+{
+  "handles": [
+    "spatham",
+    "amitsabnis2004",
+    "kvsiddarth99913",
+    "loganwick.jr",
+    "saianudra",
+    "g_sahithi",
+    "kinnporsche",
+    "loganwick"
+  ],
+  "minProblemRating": 800,
+  "maxProblemRating": 4000,
+  "numberOfContests": 10000,
+  "problemRatingDistribution": {
+    "800": 0,
+    "900": 0,
+    "1000": 0,
+    "1100": 0,
+    "1200": 0,
+    "1300": 0,
+    "1400": 2,
+    "1500": 3,
+    "1600": 3,
+    "1700": 0,
+    "1800": 0,
+    "1900": 0
+  },
+  "validContests": ["Div. 2", "Div. 3"],
+  "includeTags": [],
+  "excludeTags": []
+}
